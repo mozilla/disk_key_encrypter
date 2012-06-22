@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+{% load active_page %}
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+    <title>Recovery Key Locker</title>
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}bootstrap/css/bootstrap-responsive.css" />
+     <style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+</head>
+<body>
+    <!-- navbar -->
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">Project name</a>
+          <div class="nav-collapse">
+            <ul class="nav">
+              {% if request.user.is_active %}
+                <li class="{% active_page request "^\/user\/upload" %}" ><a href="{% url upload %}">Upload</a></li>
+                {% if request.user.is_staff %}
+                    <li class="{% active_page request "^\/administration" %}" ><a href="{% url desktop_admin%}">Admin</a></li>
+                {% endif %}
+                <li><a href="{% url login %}">Logout</a></li>
+              {% else %}
+                <li class="active"><a href="{% url login %}">Login</a></li>
+              {% endif %}
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <!-- end navbar -->
+
+    <div class="container">
+    {% block content %}
+    {% endblock %}
+    </div>
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ STATIC_URL }}bootstrap/js/jquery.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-transition.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-alert.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-modal.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-dropdown.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-scrollspy.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-tab.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-tooltip.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-popover.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-button.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-collapse.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-carousel.js"></script>
+    <script src="{{ STATIC_URL }}bootstrap/js/bootstrap-typeahead.js"></script>
+
+
+</body>
+</html>

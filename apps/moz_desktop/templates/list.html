@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block content %}
+<div class="hero-unit">
+  <button type="button" onclick='self.location="{% url desktop_admin_upload %}";' style='float: left;' class="btn btn-primary">Upload New Key</button>  
+<form style='float: right;' method='post' action='.'>  
+  <input type="text" name='search' id='search' class="span3" style='margin-top: 9px;' placeholder="" value="{{ search }}">  
+  <button type="submit" class="btn btn-primary">Search</button>  
+  <button type="button" onclick='self.location="{% url desktop_admin %}";' class="btn reset">Reset</button>  
+{% csrf_token %}
+</form>
+    {% if search %}
+        <table class="table">  
+            <thead>  
+                <tr>  
+                    <th>Created On</th>  
+                    <th>Disk Image</th>  
+                </tr>  
+            </thead>  
+            <tbody>  
+        {% if search_list|length > 0 %}
+            {% for l in search_list %}
+            <tr>  
+                <td>{{ l.created_on|date:"n/d/Y" }}</td>  
+                <td><a href="{% url detail l.id %}">{{ l }}</a></td>  
+            </tr>  
+            {% endfor %}
+        {% else %}
+            <tr>  
+                <td colspan="2">No Records Found</td>  
+            </tr> 
+        {% endif %}
+            </tbody>
+        </table>
+
+    {% else %}
+        <table class="table">  
+                <thead>  
+                    <tr>  
+                        <th>Created On</th>  
+                        <th>Disk Image</th>  
+                    </tr>  
+                </thead>  
+                <tbody>  
+                {% for l in list %}
+                <tr>  
+                    <td>{{ l.created_on|date:"n/d/Y" }}</td>  
+                    <td><a href="{% url detail l.id %}">{{ l }}</a></td>  
+                </tr>  
+                {% endfor %}
+                </tbody>
+        </table>
+        <div class="pagination">
+            <ul>
+            {% if list.has_previous %}
+                <li><a href="?page={{ list.previous_page_number }}{{ getvars }}{{ hashtag }}" class="prev">&lsaquo;&lsaquo; {% trans "previous" %}</a></li>
+            {% else %}
+                <li class="disabled prev"><a href="#">&lsaquo;&lsaquo; {% trans "previous" %}</a></li>
+            {% endif %}
+            {% for page in pages %}
+                {% if page %}
+                    {% ifequal page list.number %}
+                        <li class="current page active"><a href="#">{{ page }}</a></li>
+                    {% else %}
+                        <li><a href="?page={{ page }}{{ getvars }}{{ hashtag }}" class="page">{{ page }}</a></li>
+                    {% endifequal %}
+                {% else %}
+                    ...
+                {% endif %}
+            {% endfor %}
+            {% if list.has_next %}
+                <li><a href="?page={{ list.next_page_number }}{{ getvars }}{{ hashtag }}" class="next">{% trans "next" %} &rsaquo;&rsaquo;</a></li>
+            {% else %}
+                <li class="disabled next"><a href="#">{% trans "next" %} &rsaquo;&rsaquo;</a></li>
+            {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
