@@ -80,7 +80,7 @@ def upload(request):
 def desktop_admin(request):                                                                                                                                                                   
     list = site_models.EncryptedDisk.objects.all()
     paginator = Paginator(list, PAGINATION_LENGTH)
-    page = request.GET.get('page')
+    page_number = request.GET.get('page', 0)
     try:
         list = paginator.page(page)
     except PageNotAnInteger:
@@ -88,7 +88,7 @@ def desktop_admin(request):
         list = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        list = page(paginator.num_pages)
+        list = paginator.page(paginator.num_pages)
     search_list = []
     search = ''
     if request.method == 'POST':
@@ -104,7 +104,6 @@ def desktop_admin(request):
         'search_list': search_list,
         },
         RequestContext(request))
-    return HttpResponse('asdf')
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def download_attach(request, filename):
