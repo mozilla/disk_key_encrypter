@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 import datetime
 from database_storage import DatabaseStorage
-
+from cef import log_cef
 from settings import DBS_OPTIONS
 class EncryptionType(models.Model):
     encryption_type = models.CharField(max_length=128)
@@ -23,6 +23,7 @@ class EncryptedDisk(models.Model):
         if not self.id:
             self.created_on = datetime.datetime.today()
         self.updated_on = datetime.datetime.today()
+
         return super(EncryptedDisk, self).save(*args, **kwargs)
 
     def __unicode__(self):

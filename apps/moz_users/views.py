@@ -4,6 +4,8 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from apps.site import forms
+from apps.site.cef import log_cef
+import settings
 
 
 @login_required
@@ -20,6 +22,7 @@ def upload(request):
             f.email_address = request.user.username
             f.save()
             success = 1
+            log_cef("%s uploaded key/pass" % (request.user,), 0, request, settings, request.user)
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
             error = 'Validation Failed'

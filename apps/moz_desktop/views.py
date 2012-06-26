@@ -11,6 +11,9 @@ from settings import DBS_OPTIONS, PAGINATION_LENGTH
 import mimetypes
 import operator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.urlresolvers import reverse
+from apps.site.cef import log_cef
+import settings
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def detail(request, id):                                                                                                                                                                   
@@ -29,6 +32,7 @@ def detail(request, id):
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
+                log_cef("%s updated key/pass with id %s" % (request.user, id,), 0, request, settings, request.user)
                 success = 1
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
@@ -37,6 +41,7 @@ def detail(request, id):
             error = 'An unknown error has occured %s' % e
     else:
         form = forms.UploadFormDesktop(instance=disk)
+        log_cef("%s viewed key/pass with id %s" % (request.user, id,), 0, request, settings, request.user)
     return render_to_response('detail.html', {
         'form': form,
         'id': id,
@@ -61,6 +66,8 @@ def upload(request):
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
+                log_cef("%s uploaded key/pass" % (request.user,), 0, request, settings, request.user)
+                return HttpResponseRedirect(reverse('desktop_admin'))
                 success = 1
         except ValueError:
             error = 'Validation Failed'
@@ -120,4 +127,5 @@ def download_attach(request, filename):
         response['Content-Disposition'] = 'inline; filename=%s' % filename
         if content_encoding:
             response['Content-Encoding'] = content_encoding
+        log_cef("%s downloaded %s" % (request.user, filename), 0, request, settings, request.user)
         return response
