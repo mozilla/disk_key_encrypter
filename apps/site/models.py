@@ -27,6 +27,7 @@ class EncryptedDisk(models.Model):
 
     def __unicode__(self):
         return "%s - %s" % (self.user.username, str(self.asset_tag))
+
     search_fields = (
                 'email_address',
                 'asset_tag',

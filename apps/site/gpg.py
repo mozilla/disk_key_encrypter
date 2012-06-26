@@ -29,7 +29,7 @@ in debug mode.
     pass
 
 
-def encrypt(data, key_ids=None):
+def encrypt(data, key_ids=None, homedir=''):
     """
 Encrypt data with the public keys as specified as key_ids of the
 application keyring. Data may contain unicode characters, which are sent
@@ -43,7 +43,7 @@ to GPG as UTF-8 data.
     args = [GPG_BIN, '--encrypt', '--no-options', '--trust-model', 'always', '--batch', '--armor']
 
     if GPG_KEYRING_FILE:
-        args += ['--no-default-keyring', '--keyring', GPG_KEYRING_FILE, '--homedir', '/root/.gnupg']
+        args += ['--no-default-keyring', '--keyring', GPG_KEYRING_FILE, '--homedir', homedir]
 
     for key_id in key_ids:
         args += ['--recipient', key_id]

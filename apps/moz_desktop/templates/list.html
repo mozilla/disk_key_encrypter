@@ -42,7 +42,7 @@
                     </tr>  
                 </thead>  
                 <tbody>  
-                {% for l in list %}
+                {% for l in list.object_list %}
                 <tr>  
                     <td>{{ l.created_on|date:"n/d/Y" }}</td>  
                     <td><a href="{% url detail l.id %}">{{ l }}</a></td>  

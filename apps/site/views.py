@@ -26,7 +26,7 @@ def login_view(request):
         form = forms.LoginForm(request.POST)
         if form.is_valid():
             user = authenticate(username = form.cleaned_data['username'], password=form.cleaned_data['password'])
-            if user.is_active:
+            if user:
                 login(request, user)
             if user is not None:
                 if user.is_desktop:

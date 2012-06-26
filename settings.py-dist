@@ -218,3 +218,4 @@ DBS_OPTIONS = {
         'base_url': '/administration/attach/',
     }
 PAGINATION_LENGTH=5
+HOMEDIR = ''
