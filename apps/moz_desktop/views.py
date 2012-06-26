@@ -80,9 +80,9 @@ def upload(request):
 def desktop_admin(request):                                                                                                                                                                   
     list = site_models.EncryptedDisk.objects.all()
     paginator = Paginator(list, PAGINATION_LENGTH)
-    page_number = request.GET.get('page', 0)
+    page_number = request.GET.get('page', 1)
     try:
-        list = paginator.page(page)
+        list = paginator.page(page_number)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
         list = paginator.page(1)
