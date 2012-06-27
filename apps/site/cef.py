@@ -10,6 +10,5 @@ def log_cef(message_name, message_description, items=[]):
             label_string = label_string.join("%s=%s " %(key, value))
             
     cefmsg = 'CEF:0|Mozilla|%s|1.0|%s|%s|5|%s dhost=%s'% (PROG_NAME, message_name, message_description, label_string, os.uname()[1])
-    import pdb; pdb.set_trace()
     syslog.syslog(syslog.LOG_INFO, cefmsg)
     syslog.closelog()
