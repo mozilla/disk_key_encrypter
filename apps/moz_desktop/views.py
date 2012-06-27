@@ -39,7 +39,7 @@ def detail(request, id):
                 items.append({'cs2Label': 'id'})
                 items.append({'cs2': id})
                 items.append({'duser': f.email_address})
-                log_cef("AdminUpdate", "Desktop Admin Updated info for % - %s" % (f.email_address, f.asset_tag), items)
+                log_cef("AdminUpdate", "Desktop Admin Updated info for %s - %s" % (f.email_address, f.asset_tag), items)
                 success = 1
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
