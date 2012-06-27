@@ -12,6 +12,9 @@ import settings
 def upload(request):                                                                                                                                                                   
     error = None
     success = request.GET.get('success', False)
+    items = []
+    items.append({'suser': request.user})
+    log_cef("UserUpload", "User uploaded new key", items)
     if success:
         success = 'Successfully Uploaded'
     if request.method == "POST":
@@ -22,7 +25,10 @@ def upload(request):
             f.email_address = request.user.username
             f.save()
             success = 1
-            log_cef("%s uploaded key/pass" % (request.user,), 0, request, settings, request.user)
+            items = []
+            items.append({'user': request.user})
+            items.append({'asset_tag': f.asset_tag})
+            log_cef("UserUpload", "User uploaded new key", items)
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
             error = 'Validation Failed'

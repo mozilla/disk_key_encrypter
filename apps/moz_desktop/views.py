@@ -32,7 +32,14 @@ def detail(request, id):
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
-                log_cef("%s updated key/pass with id %s" % (request.user, id,), 0, request, settings, request.user)
+                items = []
+                items.append({'suser': request.user})
+                items.append({'cs1Label': 'asset_tag'})
+                items.append({'cs1': disk.asset_tag})
+                items.append({'cs2Label': 'id'})
+                items.append({'cs2': id})
+                items.append({'duser': f.email_address})
+                log_cef("AdminUpdate", "Desktop Admin Updated info for % - %s" % (f.email_address, f.asset_tag), items)
                 success = 1
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
@@ -41,7 +48,14 @@ def detail(request, id):
             error = 'An unknown error has occured %s' % e
     else:
         form = forms.UploadFormDesktop(instance=disk)
-        log_cef("%s viewed key/pass with id %s" % (request.user, id,), 0, request, settings, request.user)
+        items = []
+        items.append({'suser': request.user})
+        items.append({'cs1Label': 'asset_tag'})
+        items.append({'cs1': disk.asset_tag})
+        items.append({'cs2Label': 'id'})
+        items.append({'cs2': id})
+        items.append({'duser': f.email_address})
+        log_cef("AdminView", "Desktop Admin viewed info for % - %s" % (f.email_address, f.asset_tag), items)
     return render_to_response('detail.html', {
         'form': form,
         'id': id,
@@ -66,7 +80,11 @@ def upload(request):
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
-                log_cef("%s uploaded key/pass" % (request.user,), 0, request, settings, request.user)
+                items = []
+                items.append({'user': request.user})
+                items.append({'asset_tag': f.asset_tag})
+                items.append({'duser': f.email_address})
+                log_cef("AdminCreate", "Desktop Admin Created key for key for %s - %s" % (f.email_address, f.asset_tag), items)
                 return HttpResponseRedirect(reverse('desktop_admin'))
                 success = 1
         except ValueError:
@@ -127,5 +145,9 @@ def download_attach(request, filename):
         response['Content-Disposition'] = 'inline; filename=%s' % filename
         if content_encoding:
             response['Content-Encoding'] = content_encoding
-        log_cef("%s downloaded %s" % (request.user, filename), 0, request, settings, request.user)
+        items = []
+        items.append({'suser': request.user})
+        items.append({'cs1Label': 'filename'})
+        items.append({'cs1': filename})
+        log_cef("AdminDownload", "Desktop Admin downloaded key for %s" % f.email_address, items)
         return response

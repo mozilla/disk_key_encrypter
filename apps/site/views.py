@@ -29,11 +29,21 @@ def login_view(request):
             if user:
                 login(request, user)
             if user is not None:
+                items = []
+                items.append({'suser': username})
+                items.append({'cs1Label': 'LoginSuccess'})
+                items.append({'cs1': 'True'})
+                log_cef("LoginSuccess", "Login Succeeded For %s" % f.email_address, items)
                 if user.is_desktop:
                     return HttpResponseRedirect(reverse('desktop_admin'))
                 else:
                     return HttpResponseRedirect(reverse('upload'))
             else:
+                items = []
+                items.append({'suser': username})
+                items.append({'cs1Label': 'LoginSuccess'})
+                items.append({'cs1': 'False'})
+                log_cef("LoginFail", "Login Failed For %s" % username, items)
                 error = 'Invalid Username/Password'
         else:
             error = 'Please supply both a username and password'
