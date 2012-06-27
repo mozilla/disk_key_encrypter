@@ -54,7 +54,7 @@ def detail(request, id):
         items.append({'cs1': disk.asset_tag})
         items.append({'cs2Label': 'id'})
         items.append({'cs2': id})
-        items.append({'duser': f.email_address})
+        items.append({'duser': disk.email_address})
         log_cef("AdminView", "Desktop Admin viewed info for % - %s" % (f.email_address, f.asset_tag), items)
     return render_to_response('detail.html', {
         'form': form,
