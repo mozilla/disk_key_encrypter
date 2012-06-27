@@ -149,5 +149,5 @@ def download_attach(request, filename):
         items.append({'suser': request.user})
         items.append({'cs1Label': 'filename'})
         items.append({'cs1': filename})
-        log_cef("AdminDownload", "Desktop Admin downloaded key for %s" % f.email_address, items)
+        log_cef("AdminDownload", "Desktop Admin downloaded file %s" % filename)
         return response
