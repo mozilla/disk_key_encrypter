@@ -2,7 +2,7 @@ from django import forms
 import models
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from apps.site.gpg import encrypt
-from settings import GPG_KEY_IDS
+from settings import GPG_KEY_IDS,HOMEDIR
 
 class LoginForm(forms.Form):
     username = forms.CharField(required=True)
@@ -23,13 +23,13 @@ class UploadFormUser(forms.ModelForm):
 
 
         if len(data) > 0:
-            data = encrypt(data, GPG_KEY_IDS)
+            data = encrypt(data, GPG_KEY_IDS, HOMEDIR)
         return data
     def clean_binary_blob(self):
         data = self.cleaned_data['binary_blob']
         try:
             tmp = data.file.read()
-            encrypted = encrypt(tmp, GPG_KEY_IDS)
+            encrypted = encrypt(tmp, GPG_KEY_IDS, HOMEDIR)
             data.file.truncate(0)
             data.file.seek(0)
             data.file.write(encrypted)
