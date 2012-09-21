@@ -1,4 +1,6 @@
 """
+    Original library found here:
+    https://github.com/timbaobjects/django-sts
     Strict Transport Security is a mechanism that enables a web server or
     web application to tell supporting browsers to always use HTTPS when 
     communicating with them.
