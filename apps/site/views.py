@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 import models
 import forms
 from django.contrib.auth import login, logout, authenticate
+from apps.site.cef import log_cef
 
 
 class HomePage(TemplateView):
@@ -33,8 +34,8 @@ def login_view(request):
                 items.append({'suser': username})
                 items.append({'cs1Label': 'LoginSuccess'})
                 items.append({'cs1': 'True'})
-                log_cef("LoginSuccess", "Login Succeeded For %s" % f.email_address, items)
-                if user.is_desktop:
+                log_cef("LoginSuccess", "Login Succeeded For %s" % user.email, items)
+                if hasattr(user, 'is_desktop') and user.is_desktop:
                     return HttpResponseRedirect(reverse('desktop_admin'))
                 else:
                     return HttpResponseRedirect(reverse('upload'))
