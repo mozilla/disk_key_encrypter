@@ -17,8 +17,7 @@ class UploadFormUser(forms.ModelForm):
             Going to start with 10MB and see where
             that gets us
         """
-
-        if data._size > 10*1024*1024:
+        if data.file._size > 10*1024*1024:
             raise forms.ValidationError("Image file too large ( > 10mb )")
 
 

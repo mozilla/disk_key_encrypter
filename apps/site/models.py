@@ -27,7 +27,10 @@ class EncryptedDisk(models.Model):
         return super(EncryptedDisk, self).save(*args, **kwargs)
 
     def __unicode__(self):
-        return "%s - %s" % (self.user.username, str(self.asset_tag))
+        try:
+            return "%s - %s" % (self.user.username, str(self.asset_tag))
+        except:
+            return "%s - %s" % (self.email_address, str(self.asset_tag))
 
     search_fields = (
                 'email_address',
