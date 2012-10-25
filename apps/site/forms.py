@@ -25,7 +25,6 @@ class UploadFormUser(forms.ModelForm):
 
     def clean_binary_blob(self):
         data = self.cleaned_data['binary_blob']
-        import pdb; pdb.set_trace()
         if data.file._size > 10*1024*1024:
             raise forms.ValidationError("Image file too large ( > 10mb )")
         try:
