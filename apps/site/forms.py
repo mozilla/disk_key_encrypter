@@ -25,8 +25,11 @@ class UploadFormUser(forms.ModelForm):
 
     def clean_binary_blob(self):
         data = self.cleaned_data['binary_blob']
-        if data.file._size > 10*1024*1024:
-            raise forms.ValidationError("Image file too large ( > 10mb )")
+        try:
+            if data.file._size > 10*1024*1024:
+                raise forms.ValidationError("Image file too large ( > 10mb )")
+        except:
+            pass
         try:
             tmp = data.file.read()
             encrypted = encrypt(tmp, GPG_KEY_IDS, HOMEDIR)
