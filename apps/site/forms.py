@@ -17,15 +17,17 @@ class UploadFormUser(forms.ModelForm):
             Going to start with 10MB and see where
             that gets us
         """
-        if data.file._size > 10*1024*1024:
-            raise forms.ValidationError("Image file too large ( > 10mb )")
 
 
         if len(data) > 0:
             data = encrypt(data, GPG_KEY_IDS, HOMEDIR)
         return data
+
     def clean_binary_blob(self):
         data = self.cleaned_data['binary_blob']
+        import pdb; pdb.set_trace()
+        if data.file._size > 10*1024*1024:
+            raise forms.ValidationError("Image file too large ( > 10mb )")
         try:
             tmp = data.file.read()
             encrypted = encrypt(tmp, GPG_KEY_IDS, HOMEDIR)
