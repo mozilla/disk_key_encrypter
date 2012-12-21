@@ -36,7 +36,15 @@ def login_view(request):
                 items.append({'cs1': 'True'})
                 log_cef("LoginSuccess", "Login Succeeded For %s" % user.email, items)
                 if hasattr(user, 'is_desktop') and user.is_desktop:
-                    return HttpResponseRedirect(reverse('desktop_admin'))
+                    """
+                        Per bug #822396
+                        Redirecting all logins to reverse('upload')
+                        I can't replicate in dev, so going to test
+                        to see if the issue is based on something
+                        specific to an ldap bit for the user
+                    """
+                    return HttpResponseRedirect(reverse('upload'))
+                    #return HttpResponseRedirect(reverse('desktop_admin'))
                 else:
                     return HttpResponseRedirect(reverse('upload'))
             else:
