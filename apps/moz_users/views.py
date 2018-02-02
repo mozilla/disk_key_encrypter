@@ -1,6 +1,6 @@
 # Create your views here.
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from apps.site import forms
@@ -36,9 +36,8 @@ def upload(request):
             error = 'An unknown error has occured %s' % e
     else:
         form = forms.UploadFormUser()
-    return render_to_response('upload.html', {
+    return render(request, 'upload.html', {
         'form': form,
         'success': success,
         'error': error,
-        },
-        RequestContext(request))
+        })
