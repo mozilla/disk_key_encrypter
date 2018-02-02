@@ -1,6 +1,6 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import url, include
 import views
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^upload[/]$', views.upload, name='upload'),
-)
+]

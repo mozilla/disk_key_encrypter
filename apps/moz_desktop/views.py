@@ -1,12 +1,12 @@
 # Create your views here.
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.decorators import user_passes_test
 import apps.site.models as site_models
 import apps.site.forms as forms
 from django.db.models import Q
-from database_storage import DatabaseStorage
+from vendor.database_storage import DatabaseStorage
 from settings import DBS_OPTIONS, PAGINATION_LENGTH
 import mimetypes
 import operator
@@ -56,13 +56,12 @@ def detail(request, id):
         items.append({'cs2': id})
         items.append({'duser': disk.email_address})
         log_cef("AdminView", "Desktop Admin viewed info for %s - %s" % (disk.email_address, disk.asset_tag), items)
-    return render_to_response('detail.html', {
+    return render(request, 'detail.html', {
         'form': form,
         'id': id,
         'success': success,
         'error': error,
-        },
-        RequestContext(request))
+        })
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def upload(request):                                                                                                                                                                   
@@ -93,13 +92,12 @@ def upload(request):
             error = 'An unknown error has occured %s' % e
     else:
         form = forms.UploadFormDesktopUpload()
-    return render_to_response('desktop_admin_upload.html', {
+    return render(request, 'desktop_admin_upload.html', {
         'form': form,
         'id': id,
         'success': success,
         'error': error,
-        },
-        RequestContext(request))
+        })
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def desktop_admin(request):                                                                                                                                                                   
@@ -123,12 +121,11 @@ def desktop_admin(request):
                         for t in site_models.EncryptedDisk.search_fields]
             search_list = site_models.EncryptedDisk.objects.filter(reduce(operator.or_, filters))
 
-    return render_to_response('list.html', {
+    return render(request, 'list.html', {
         'list': list,
         'search':search,
         'search_list': search_list,
-        },
-        RequestContext(request))
+        })
 
 @user_passes_test(lambda u: u.is_staff, login_url='/login/')
 def download_attach(request, filename):
@@ -141,7 +138,7 @@ def download_attach(request, filename):
        
         # Prepare response
         content_type, content_encoding = mimetypes.guess_type(filename)
-        response = HttpResponse(content=file_content, mimetype=content_type)
+        response = HttpResponse(content=file_content, content_type=content_type)
         response['Content-Disposition'] = 'inline; filename=%s' % filename
         if content_encoding:
             response['Content-Encoding'] = content_encoding
