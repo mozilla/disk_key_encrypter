@@ -136,8 +136,11 @@ class DatabaseStorage(Storage):
         row = cursor.fetchone()
         if row is None:
             return None
-
-        inMemFile = StringIO.StringIO(base64.b64decode(row[0]))
+        data = row[0]
+        missing_padding = len(data) % 4
+        if missing_padding != 0:
+            data += b'='* (4 - missing_padding)
+        inMemFile = StringIO.StringIO(base64.b64decode(data))
         inMemFile.name = name
         inMemFile.mode = mode
 
