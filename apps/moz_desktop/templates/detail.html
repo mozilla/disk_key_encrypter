@@ -12,10 +12,10 @@
             {{ success }}
         </div>
     {% endif %}
-    <form method="post" enctype="multipart/form-data" class="" action="{% url detail id %}">
+    <form method="post" enctype="multipart/form-data" class="" action="{% url "detail" id %}">
     {{ form.as_table }}
     <p>
-        <button onclick='self.location = "{% url desktop_admin %}";' type="button" name="btn_cancel" id="btn_cancel" class="btn btn-cancel">Cancel</button>
+        <button onclick='self.location = "{% url "desktop_admin" %}";' type="button" name="btn_cancel" id="btn_cancel" class="btn btn-cancel">Cancel</button>
         <button type="submit" name="submit" id="submit" class="btn btn-primary">Save</button>
     </p>
     {% csrf_token %}

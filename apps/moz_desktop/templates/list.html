@@ -2,11 +2,11 @@
 {% load i18n %}
 {% block content %}
 <div class="hero-unit">
-  <button type="button" onclick='self.location="{% url desktop_admin_upload %}";' style='float: left;' class="btn btn-primary">Upload New Key</button>  
+  <button type="button" onclick='self.location="{% url "desktop_admin_upload" %}";' style='float: left;' class="btn btn-primary">Upload New Key</button>  
 <form style='float: right;' method='post' action='.'>  
   <input type="text" name='search' id='search' class="span3" style='margin-top: 9px;' placeholder="" value="{{ search }}">  
   <button type="submit" class="btn btn-primary">Search</button>  
-  <button type="button" onclick='self.location="{% url desktop_admin %}";' class="btn reset">Reset</button>  
+  <button type="button" onclick='self.location="{% url "desktop_admin" %}";' class="btn reset">Reset</button>  
 {% csrf_token %}
 </form>
     {% if search %}
@@ -22,7 +22,7 @@
             {% for l in search_list %}
             <tr>  
                 <td>{{ l.created_on|date:"n/d/Y" }}</td>  
-                <td><a href="{% url detail l.id %}">{{ l }}</a></td>  
+                <td><a href="{% url "detail" l.id %}">{{ l }}</a></td>  
             </tr>  
             {% endfor %}
         {% else %}
@@ -45,7 +45,7 @@
                 {% for l in list.object_list %}
                 <tr>  
                     <td>{{ l.created_on|date:"n/d/Y" }}</td>  
-                    <td><a href="{% url detail l.id %}">{{ l }}</a></td>  
+                    <td><a href="{% url "detail" l.id %}">{{ l }}</a></td>  
                 </tr>  
                 {% endfor %}
                 </tbody>
