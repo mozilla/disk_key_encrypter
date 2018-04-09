@@ -36,7 +36,6 @@ application keyring. Data may contain unicode characters, which are sent
 to GPG as UTF-8 data.
 """
 
-    #import pdb; pdb.set_trace()
     if not key_ids:
         key_ids = GPG_KEY_IDS
 

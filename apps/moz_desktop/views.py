@@ -1,8 +1,8 @@
 # Create your views here.
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
-from django.contrib.auth.decorators import user_passes_test
 import apps.site.models as site_models
 import apps.site.forms as forms
 from django.db.models import Q
@@ -14,8 +14,17 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from apps.site.cef import log_cef
 import settings
+def user_has_claim(function):
+    def wrap(request, *args, **kwargs):
+        if settings.OIDC_DESKTOP_CLAIM_GROUP in request.session.get('claim_groups'):
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
 
-@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+@user_has_claim
 def detail(request, id):                                                                                                                                                                   
     error = None
     success = request.GET.get('success', False)
@@ -63,7 +72,7 @@ def detail(request, id):
         'error': error,
         })
 
-@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+@user_has_claim
 def upload(request):                                                                                                                                                                   
     error = None
     success = request.GET.get('success', False)
@@ -99,7 +108,7 @@ def upload(request):
         'error': error,
         })
 
-@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+@user_has_claim
 def desktop_admin(request):                                                                                                                                                                   
     list = site_models.EncryptedDisk.objects.all()
     paginator = Paginator(list, PAGINATION_LENGTH)
@@ -127,7 +136,7 @@ def desktop_admin(request):
         'search_list': search_list,
         })
 
-@user_passes_test(lambda u: u.is_staff, login_url='/login/')
+@user_has_claim
 def download_attach(request, filename):
         # Read file from database
         storage = DatabaseStorage(DBS_OPTIONS)

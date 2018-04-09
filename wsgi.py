@@ -25,3 +25,18 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
+
+# OpenIDC connection might require a proxy
+try:
+    from settings import USE_WSGI_OUTBOUND_PROXY
+except:
+    USE_WSGI_OUTBOUND_PROXY = False
+
+try:
+    from settings import WSGI_OUTBOUND_PROXY
+except:
+    WSGI_OUTBOUND_PROXY = ''
+
+if USE_WSGI_OUTBOUND_PROXY is True:
+    os.environ['http_proxy'] = WSGI_OUTBOUND_PROXY
+    os.environ['https_proxy'] = WSGI_OUTBOUND_PROXY

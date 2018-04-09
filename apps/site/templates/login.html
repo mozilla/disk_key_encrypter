@@ -2,17 +2,8 @@
 {% block content %}
 <div class="hero-unit">
     <h2>Please Login</h2>
-    {% if error %}
-    <div class="alert alert-error">
-        {{ error }}
-    </div>
-    {% endif %}
-    <form method="post" class="form-inline" action=".">
-    {{ form.as_p }}
-    <p>
-        <button type="submit" name="submit" id="submit" class="btn btn-primary">Login</button>
-    </p>
-    {% csrf_token %}
-    </form>
+        <a href="{% url 'oidc_authentication_init' %}">
+            <button type="submit" name="submit" id="submit" class="btn btn-primary">Login via OpenIDC</button>
+        </a>
 </div>
 {% endblock %}
