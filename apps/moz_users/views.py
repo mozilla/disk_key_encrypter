@@ -22,7 +22,7 @@ def upload(request):
         try:
             f = form.save(commit=False)
             f.user = request.user
-            f.email_address = request.user.username
+            f.email_address = request.user.email
             f.save()
             success = 1
             items = []

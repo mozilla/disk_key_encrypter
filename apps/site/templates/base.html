@@ -26,15 +26,14 @@
           <a class="brand" href="#">Desktop Key Locker</a>
           <div class="nav-collapse">
             <ul class="nav">
-              {% if request.user.is_active %}
-                <li class="{% active_page request "^\/user\/upload" %}" ><a href="{% url "upload" %}">Upload</a></li>
-                {% if request.user.is_staff %}
+                {% if user.is_authenticated and has_admin_claim_group and allow_admin %}
                     <li class="{% active_page request "^\/administration" %}" ><a href="{% url "desktop_admin" %}">Admin</a></li>
                 {% endif %}
-                <li><a href="{% url "login" %}">Logout</a></li>
-              {% else %}
-                <li class="active"><a href="{% url "login" %}">Login</a></li>
-              {% endif %}
+            {% if user.is_authenticated %}
+              <li class="{% active_page request "^\/user\/upload" %}" ><a href="{% url "upload" %}">Upload</a></li>
+            {% else %}
+              <li><a href="{% url 'oidc_authentication_init' %}">Login</a></li>
+            {% endif %}
             </ul>
           </div><!--/.nav-collapse -->
         </div>
