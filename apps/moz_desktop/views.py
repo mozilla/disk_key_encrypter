@@ -1,5 +1,6 @@
 # Create your views here.
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
@@ -13,15 +14,21 @@ import operator
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from apps.site.cef import log_cef
-import settings
-def user_has_claim(function):
+from django.conf import settings
+
+
+def user_has_claim(func):
     def wrap(request, *args, **kwargs):
-        if settings.OIDC_DESKTOP_CLAIM_GROUP in request.session.get('claim_groups'):
-            return function(request, *args, **kwargs)
+        # This check is in addition to the check done by openresty and acts as
+        # a redundant check for added security
+        groups = request.META.get(settings.GROUPS_META_VAR,'').split('|')
+        if (hasattr(request, 'user') and request.user.is_authenticated()
+                and settings.OIDC_DESKTOP_CLAIM_GROUP in groups):
+            return func(request, *args, **kwargs)
         else:
             raise PermissionDenied
-    wrap.__doc__ = function.__doc__
-    wrap.__name__ = function.__name__
+    wrap.__doc__ = func.__doc__
+    wrap.__name__ = func.__name__
     return wrap
 
 @user_has_claim

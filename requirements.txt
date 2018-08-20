@@ -1,2 +1,1 @@
 django==1.11.10
-mozilla-django-oidc==mozilla-django-oidc==0.6.0

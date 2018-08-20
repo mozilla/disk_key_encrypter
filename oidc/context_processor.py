@@ -1,4 +1,5 @@
 from django import template
+from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.conf import settings
 
 def has_admin_claim_group(request):
@@ -6,10 +7,14 @@ def has_admin_claim_group(request):
     r_context['has_admin_claim_group'] = False
     try:
         c_group = settings.OIDC_DESKTOP_CLAIM_GROUP
-        if c_group in request.session['claim_groups']:
+
+        # This check is in addition to the check done by openresty and acts as
+        # a redundant check for added security
+        groups = request.META.get(settings.GROUPS_META_VAR,'').split('|')
+        if c_group in groups:
             r_context['has_admin_claim_group'] = True
     except:
-        r_context['has_admin_claim_group'] = True
+        r_context['has_admin_claim_group'] = False
     return r_context
     
 def allow_admin(request):

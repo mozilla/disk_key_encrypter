@@ -3,7 +3,7 @@
 {% load static %}
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <title>Recovery Key Locker</title>
     <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.css" %}" />
     <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap-responsive.css" %}" />
@@ -32,7 +32,7 @@
             {% if user.is_authenticated %}
               <li class="{% active_page request "^\/user\/upload" %}" ><a href="{% url "upload" %}">Upload</a></li>
             {% else %}
-              <li><a href="{% url 'oidc_authentication_init' %}">Login</a></li>
+              <li>This should never display as users are authenticated by openresty</li>
             {% endif %}
             </ul>
           </div><!--/.nav-collapse -->

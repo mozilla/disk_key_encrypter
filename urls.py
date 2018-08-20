@@ -6,19 +6,16 @@ from apps.site.views import login_view
 from apps.moz_users.views import upload
 from django.conf import settings
 
+# URLs accessible on any Django instance
+urlpatterns = [
+    url(r'^user/', include('apps.moz_users.urls')),
+    url(r"^login[/]", login_view, name="login"),
+    url(r'^$', upload),
+]
+
+# URLs only accessible on a non-public Django instance
 if settings.ALLOW_ADMIN:
-    urlpatterns = [
-        url(r'^user/', include('apps.moz_users.urls')),
-        url(r"^login[/]", login_view, name="login"),
-        url(r'^oidc/', include('mozilla_django_oidc.urls')),
-        url(r'^$', upload),
+    urlpatterns.extend([
         url(r'^administration/', include('apps.moz_desktop.urls')),
         url(r'^admin/', include(admin.site.urls)),
-    ]
-else:
-    urlpatterns = [
-        url(r'^user/', include('apps.moz_users.urls')),
-        url(r"^login[/]", login_view, name="login"),
-        url(r'^oidc/', include('mozilla_django_oidc.urls')),
-        url(r'^$', upload),
-    ]
+    ])

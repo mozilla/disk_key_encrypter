@@ -28,7 +28,7 @@ class EncryptedDisk(models.Model):
 
     def __unicode__(self):
         try:
-            return "%s - %s" % (self.user.email, str(self.asset_tag))
+            return "%s - %s" % (self.user.username, str(self.asset_tag))
         except:
             return "%s - %s" % (self.email_address, str(self.asset_tag))
 

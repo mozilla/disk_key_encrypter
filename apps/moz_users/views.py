@@ -1,14 +1,27 @@
 # Create your views here.
 from django.http import HttpResponseRedirect
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from apps.site import forms
 from apps.site.cef import log_cef
 import settings
+import logging
 
+def remote_user_login_required(function):
+    # https://www.adelton.com/django/external-authentication-for-django-projects#idm139850931541280
+    # https://code.djangoproject.com/ticket/25164
+    def wrap(request, *args, **kwargs):
+        if hasattr(request, 'user') and request.user.is_authenticated():
+            return function(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
+    wrap.__doc__ = function.__doc__
+    wrap.__name__ = function.__name__
+    return wrap
 
-@login_required
+@remote_user_login_required
 def upload(request):                                                                                                                                                                   
     error = None
     success = request.GET.get('success', False)
@@ -22,7 +35,7 @@ def upload(request):
         try:
             f = form.save(commit=False)
             f.user = request.user
-            f.email_address = request.user.email
+            f.email_address = request.user.username
             f.save()
             success = 1
             items = []
