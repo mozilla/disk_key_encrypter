@@ -1,9 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="hero-unit">
-    <h2>Please Login</h2>
-        <a href="{% url 'oidc_authentication_init' %}">
-            <button type="submit" name="submit" id="submit" class="btn btn-primary">Login via OpenIDC</button>
-        </a>
+    This page should never be needed as the user logs in via openresty
 </div>
 {% endblock %}

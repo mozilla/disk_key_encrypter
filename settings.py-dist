@@ -1,16 +1,30 @@
 # Django settings for desktop_signing_webapp project.
 
 import os
-import ldap
-from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
+
+from settings_non_public import * # Either "settings_non_public" or "settings_public"
+# This import brings in three settings
+#   ALLOW_ADMIN : Allow users to access the administrative interface
+#   SECRET_KEY : This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.
+#   OIDC_DESKTOP_CLAIM_GROUP : Users must be a member of this group to access the admin site
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
 PRIVATE_DIR = os.path.abspath(os.path.join(BASE_DIR, 'private'))
-GPG_KEYRING_FILE = ''
-GPG_KEY_IDS = []
+GPG_KEYRING_FILE = ''  # Path and filename of gpg public keyring
+GPG_KEY_IDS = []  # List of gpg key ids
+HOMEDIR = ''  # Path to homedir for GPG
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+# ALLOW_ADMIN = False  # This is set in either settings_non_public.py or settings_public.py
+
+REMOTE_USER_HTTP_HEADER_NAME = 'X-Forwarded-User'
+# https://docs.djangoproject.com/en/2.1/ref/request-response/#django.http.HttpRequest.META
+REMOTE_USER_META_VAR="HTTP_%s" % REMOTE_USER_HTTP_HEADER_NAME.upper().replace('-', '_')
+GROUPS_HTTP_HEADER_NAME = 'X-Forwarded-Groups'
+GROUPS_META_VAR="HTTP_%s" % GROUPS_HTTP_HEADER_NAME.upper().replace('-', '_')
+
+ALLOWED_HOSTS=["*"]
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -21,7 +35,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '', 
+        'NAME': '',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
@@ -29,10 +43,14 @@ DATABASES = {
     }
 }
 
+
+
+# https://docs.djangoproject.com/en/1.11/howto/auth-remote-user/
+# Rely on the upstream authentication provided by a reverse proxy
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'oidc.auth.CustomOIDCAuthenticationBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
 )
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -92,23 +110,8 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'secretkeyhere'
+# SECRET_KEY = ''  # This is set in either settings_non_public.py or settings_public.py
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'mozilla_django_oidc.middleware.RefreshIDToken',
-]
 
 TEMPLATES = [
     {
@@ -116,10 +119,6 @@ TEMPLATES = [
         'APP_DIRS': True,
         'DIRS': '/data/disk_key_encrypter',
         'OPTIONS': {
-#             'loaders': (
-#                 'django.template.loaders.filesystem.Loader',
-#                 'django.template.loaders.app_directories.Loader',
-#              ),
              'debug': True,
              'context_processors': [
                  "django.template.context_processors.debug",
@@ -136,6 +135,16 @@ TEMPLATES = [
          }
     },
 ]
+
+MIDDLEWARE = [
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'middleware.wde.CustomRemoteUserMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+]
+
 
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -158,10 +167,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'mozilla_django_oidc',
 
-    'south',
-    'debug_toolbar',
+    #'south',
+    #'debug_toolbar',
 
 
     # main app
@@ -202,6 +210,11 @@ LOGGING = {
 
 SOUTH_TESTS_MIGRATE = False
 
-
-
-
+LOGIN_URL = '/login/'
+DBS_OPTIONS = {
+        'table': 'binary_blob',
+        'base_url': '/administration/attach/',
+    }
+PAGINATION_LENGTH=5
+HOMEDIR='/gpg'
+PROG_NAME = 'DESKTOP_DISK_ENCRYPTER'

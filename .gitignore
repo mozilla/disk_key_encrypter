@@ -1,6 +1,10 @@
 settings.py
 settings_local.py
 settings/local.py
+settings_non_public.py
+settings_public.py
+openresty/conf.d/secrets-public.conf
+openresty/conf.d/secrets-non-public.conf
 *.py[co]
 *.sw[po]
 .coverage

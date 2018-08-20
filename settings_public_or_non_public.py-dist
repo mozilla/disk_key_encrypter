@@ -1,0 +1,10 @@
+# Django settings for public instance of the WDE desktop_disk_encrypter project.
+
+# Allow users to access the administrative interface
+ALLOW_ADMIN = True
+
+# This is used to provide cryptographic signing, and should be set to a unique, unpredictable value.
+SECRET_KEY = ''
+
+# Users must be a member of this group to access the admin site
+OIDC_DESKTOP_CLAIM_GROUP = ''
