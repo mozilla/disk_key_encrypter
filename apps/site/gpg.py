@@ -15,7 +15,7 @@ GPG_KEY_IDS = getattr(settings, 'GPG_KEY_IDS', [])
 
 
 if not os.access(GPG_BIN, os.X_OK):
-    raise ImproperlyConfigured, "Cannot find GnuPG binary at %s" % GPG_BIN
+    raise ImproperlyConfigured("Cannot find GnuPG binary at %s" % GPG_BIN)
 
 
 class EncryptionError(Exception):
@@ -39,20 +39,26 @@ to GPG as UTF-8 data.
     if not key_ids:
         key_ids = GPG_KEY_IDS
 
-    args = [GPG_BIN, '--encrypt', '--no-options', '--trust-model', 'always', '--batch', '--armor']
+    args = [GPG_BIN, '--encrypt', '--no-options', '--trust-model', 'always', '--batch', '--armor']  # noqa
 
     if GPG_KEYRING_FILE:
-        args += ['--no-default-keyring', '--keyring', GPG_KEYRING_FILE, '--homedir', homedir]
+        args += ['--no-default-keyring', '--keyring', GPG_KEYRING_FILE, '--homedir', homedir]  # noqa
 
     for key_id in key_ids:
         args += ['--recipient', key_id]
     try:
-        gpg = subprocess.Popen(args, bufsize=4096, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #output = gpg.communicate(data.encode('utf8'))
+        gpg = subprocess.Popen(
+                args,
+                bufsize=4096,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+                )
+        # output = gpg.communicate(data.encode('utf8'))
 
         output = gpg.communicate(data)
         if gpg.returncode != 0:
-            raise EncryptionError, "%d: %s" % (gpg.returncode, output[1])
+            raise EncryptionError("%d: %s" % (gpg.returncode, output[1]))
         return output[0]
     except OSError, e:
-        raise EncryptionError, e
+        raise EncryptionError(e)

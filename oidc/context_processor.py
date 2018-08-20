@@ -1,6 +1,5 @@
-from django import template
-from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.conf import settings
+
 
 def has_admin_claim_group(request):
     r_context = {}
@@ -10,13 +9,14 @@ def has_admin_claim_group(request):
 
         # This check is in addition to the check done by openresty and acts as
         # a redundant check for added security
-        groups = request.META.get(settings.GROUPS_META_VAR,'').split('|')
+        groups = request.META.get(settings.GROUPS_META_VAR, '').split('|')
         if c_group in groups:
             r_context['has_admin_claim_group'] = True
     except:
         r_context['has_admin_claim_group'] = False
     return r_context
-    
+
+
 def allow_admin(request):
     r_context = {}
     try:
@@ -24,4 +24,3 @@ def allow_admin(request):
     except AttributeError:
         r_context['allow_admin'] = False
     return r_context
-    

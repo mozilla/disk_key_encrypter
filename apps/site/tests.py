@@ -1,11 +1,11 @@
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.models import User
+
 
 class HomePageTests(TestCase):
-    
+
     fixtures = ['users']
+
     def setUp(self):
         self.client = Client()
 

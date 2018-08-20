@@ -1,9 +1,7 @@
 # Create your views here.
 from django.core.exceptions import PermissionDenied
-from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
-from django.template import RequestContext
 import apps.site.models as site_models
 import apps.site.forms as forms
 from django.db.models import Q
@@ -21,7 +19,7 @@ def user_has_claim(func):
     def wrap(request, *args, **kwargs):
         # This check is in addition to the check done by openresty and acts as
         # a redundant check for added security
-        groups = request.META.get(settings.GROUPS_META_VAR,'').split('|')
+        groups = request.META.get(settings.GROUPS_META_VAR, '').split('|')
         if (hasattr(request, 'user') and request.user.is_authenticated()
                 and settings.OIDC_DESKTOP_CLAIM_GROUP in groups):
             return func(request, *args, **kwargs)
@@ -31,15 +29,18 @@ def user_has_claim(func):
     wrap.__name__ = func.__name__
     return wrap
 
+
 @user_has_claim
-def detail(request, id):                                                                                                                                                                   
+def detail(request, id):
     error = None
     success = request.GET.get('success', False)
     disk = get_object_or_404(site_models.EncryptedDisk, id=id)
     if success:
         success = 'Successfully Uploaded'
     if request.method == "POST":
-        form = forms.UploadFormDesktop(request.POST, request.FILES, instance=disk)
+        form = forms.UploadFormDesktop(
+                request.POST,
+                request.FILES, instance=disk)
         try:
             if form.is_valid():
                 f = form.save(commit=False)
@@ -55,7 +56,7 @@ def detail(request, id):
                 items.append({'cs2Label': 'id'})
                 items.append({'cs2': id})
                 items.append({'duser': f.email_address})
-                log_cef("AdminUpdate", "Desktop Admin Updated info for %s - %s" % (f.email_address, f.asset_tag), items)
+                log_cef("AdminUpdate", "Desktop Admin Updated info for %s - %s" % (f.email_address, f.asset_tag), items)  # noqa
                 success = 1
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
@@ -71,7 +72,7 @@ def detail(request, id):
         items.append({'cs2Label': 'id'})
         items.append({'cs2': id})
         items.append({'duser': disk.email_address})
-        log_cef("AdminView", "Desktop Admin viewed info for %s - %s" % (disk.email_address, disk.asset_tag), items)
+        log_cef("AdminView", "Desktop Admin viewed info for %s - %s" % (disk.email_address, disk.asset_tag), items)  # noqa
     return render(request, 'detail.html', {
         'form': form,
         'id': id,
@@ -79,8 +80,9 @@ def detail(request, id):
         'error': error,
         })
 
+
 @user_has_claim
-def upload(request):                                                                                                                                                                   
+def upload(request):
     error = None
     success = request.GET.get('success', False)
     if success:
@@ -99,7 +101,7 @@ def upload(request):
                 items.append({'user': request.user})
                 items.append({'asset_tag': f.asset_tag})
                 items.append({'duser': f.email_address})
-                log_cef("AdminCreate", "Desktop Admin Created key for key for %s - %s" % (f.email_address, f.asset_tag), items)
+                log_cef("AdminCreate", "Desktop Admin Created key for key for %s - %s" % (f.email_address, f.asset_tag), items)  # noqa
                 return HttpResponseRedirect(reverse('desktop_admin'))
                 success = 1
         except ValueError:
@@ -115,33 +117,39 @@ def upload(request):
         'error': error,
         })
 
+
 @user_has_claim
-def desktop_admin(request):                                                                                                                                                                   
-    list = site_models.EncryptedDisk.objects.all()
-    paginator = Paginator(list, PAGINATION_LENGTH)
+def desktop_admin(request):
+    l_list = site_models.EncryptedDisk.objects.all()
+    paginator = Paginator(l_list, PAGINATION_LENGTH)
     page_number = request.GET.get('page', 1)
     try:
-        list = paginator.page(page_number)
+        l_list = paginator.page(page_number)
     except PageNotAnInteger:
         # If page is not an integer, deliver first page.
-        list = paginator.page(1)
+        l_list = paginator.page(1)
     except EmptyPage:
         # If page is out of range (e.g. 9999), deliver last page of results.
-        list = paginator.page(paginator.num_pages)
+        l_list = paginator.page(paginator.num_pages)
     search_list = []
     search = ''
     if request.method == 'POST':
         search = request.POST['search']
         if search != '':
-            filters = [Q(**{"%s__icontains" % t: search})
-                        for t in site_models.EncryptedDisk.search_fields]
-            search_list = site_models.EncryptedDisk.objects.filter(reduce(operator.or_, filters))
+            filters = [
+                          Q(**{"%s__icontains" % t: search})
+                          for t in site_models.EncryptedDisk.search_fields
+                      ]
+            search_list = site_models.EncryptedDisk.objects.filter(
+                    reduce(operator.or_, filters)
+                    )
 
     return render(request, 'list.html', {
-        'list': list,
-        'search':search,
+        'list': l_list,
+        'search': search,
         'search_list': search_list,
         })
+
 
 @user_has_claim
 def download_attach(request, filename):
@@ -151,10 +159,13 @@ def download_attach(request, filename):
         if not gpg_file:
             raise Http404
         file_content = gpg_file.read()
-       
+
         # Prepare response
         content_type, content_encoding = mimetypes.guess_type(filename)
-        response = HttpResponse(content=file_content, content_type=content_type)
+        response = HttpResponse(
+                content=file_content,
+                content_type=content_type
+                )
         response['Content-Disposition'] = 'inline; filename=%s' % filename
         if content_encoding:
             response['Content-Encoding'] = content_encoding

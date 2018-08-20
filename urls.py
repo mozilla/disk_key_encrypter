@@ -1,10 +1,9 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-admin.autodiscover()
-import apps.site.views as app_view
 from apps.site.views import login_view
 from apps.moz_users.views import upload
 from django.conf import settings
+admin.autodiscover()
 
 # URLs accessible on any Django instance
 urlpatterns = [

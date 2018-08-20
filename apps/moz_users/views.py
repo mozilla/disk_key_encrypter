@@ -2,12 +2,9 @@
 from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
-from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
 from apps.site import forms
 from apps.site.cef import log_cef
-import settings
-import logging
+
 
 def remote_user_login_required(function):
     # https://www.adelton.com/django/external-authentication-for-django-projects#idm139850931541280
@@ -21,8 +18,9 @@ def remote_user_login_required(function):
     wrap.__name__ = function.__name__
     return wrap
 
+
 @remote_user_login_required
-def upload(request):                                                                                                                                                                   
+def upload(request):
     error = None
     success = request.GET.get('success', False)
     items = []
