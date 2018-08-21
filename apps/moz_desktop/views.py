@@ -17,7 +17,7 @@ from django.conf import settings
 
 def user_has_claim(func):
     def wrap(request, *args, **kwargs):
-        # This check is in addition to the check done by openresty and acts as
+        # This check is in addition to the check done by OpenResty and acts as
         # a redundant check for added security
         groups = request.META.get(settings.GROUPS_META_VAR, '').split('|')
         if (hasattr(request, 'user') and request.user.is_authenticated()
@@ -31,10 +31,10 @@ def user_has_claim(func):
 
 
 @user_has_claim
-def detail(request, id):
+def detail(request, id_value):
     error = None
     success = request.GET.get('success', False)
-    disk = get_object_or_404(site_models.EncryptedDisk, id=id)
+    disk = get_object_or_404(site_models.EncryptedDisk, id=id_value)
     if success:
         success = 'Successfully Uploaded'
     if request.method == "POST":
@@ -49,33 +49,35 @@ def detail(request, id):
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
-                items = []
-                items.append({'suser': request.user})
-                items.append({'cs1Label': 'asset_tag'})
-                items.append({'cs1': disk.asset_tag})
-                items.append({'cs2Label': 'id'})
-                items.append({'cs2': id})
-                items.append({'duser': f.email_address})
+                items = [
+                    {'suser': request.user},
+                    {'cs1Label': 'asset_tag'},
+                    {'cs1': disk.asset_tag},
+                    {'cs2Label': 'id'},
+                    {'cs2': id_value},
+                    {'duser': f.email_address}
+                ]
                 log_cef("AdminUpdate", "Desktop Admin Updated info for %s - %s" % (f.email_address, f.asset_tag), items)  # noqa
                 success = 1
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
             error = 'Validation Failed'
         except Exception, e:
-            error = 'An unknown error has occured %s' % e
+            error = 'An unknown error has occurred %s' % e
     else:
         form = forms.UploadFormDesktop(instance=disk)
-        items = []
-        items.append({'suser': request.user})
-        items.append({'cs1Label': 'asset_tag'})
-        items.append({'cs1': disk.asset_tag})
-        items.append({'cs2Label': 'id'})
-        items.append({'cs2': id})
-        items.append({'duser': disk.email_address})
+        items = [
+            {'suser': request.user},
+            {'cs1Label': 'asset_tag'},
+            {'cs1': disk.asset_tag},
+            {'cs2Label': 'id'},
+            {'cs2': id_value},
+            {'duser': disk.email_address}
+        ]
         log_cef("AdminView", "Desktop Admin viewed info for %s - %s" % (disk.email_address, disk.asset_tag), items)  # noqa
     return render(request, 'detail.html', {
         'form': form,
-        'id': id,
+        'id': id_value,
         'success': success,
         'error': error,
         })
@@ -97,17 +99,17 @@ def upload(request):
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
-                items = []
-                items.append({'user': request.user})
-                items.append({'asset_tag': f.asset_tag})
-                items.append({'duser': f.email_address})
+                items = [
+                    {'user': request.user},
+                    {'asset_tag': f.asset_tag},
+                    {'duser': f.email_address}
+                ]
                 log_cef("AdminCreate", "Desktop Admin Created key for key for %s - %s" % (f.email_address, f.asset_tag), items)  # noqa
                 return HttpResponseRedirect(reverse('desktop_admin'))
-                success = 1
         except ValueError:
             error = 'Validation Failed'
         except Exception, e:
-            error = 'An unknown error has occured %s' % e
+            error = 'An unknown error has occurred %s' % e
     else:
         form = forms.UploadFormDesktopUpload()
     return render(request, 'desktop_admin_upload.html', {
@@ -169,9 +171,5 @@ def download_attach(request, filename):
         response['Content-Disposition'] = 'inline; filename=%s' % filename
         if content_encoding:
             response['Content-Encoding'] = content_encoding
-        items = []
-        items.append({'suser': request.user})
-        items.append({'cs1Label': 'filename'})
-        items.append({'cs1': filename})
         log_cef("AdminDownload", "Desktop Admin downloaded file %s" % filename)
         return response

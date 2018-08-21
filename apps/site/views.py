@@ -32,11 +32,12 @@ def login_view(request):
             if user:
                 login(request, user)
             if user is not None:
-                items = []
-                items.append({'suser': username})
-                items.append({'cs1Label': 'LoginSuccess'})
-                items.append({'cs1': 'True'})
-                log_cef("LoginSuccess", "Login Succeeded For %s" % user.email, items) # noqa
+                items = [
+                    {'suser': username},
+                    {'cs1Label': 'LoginSuccess'},
+                    {'cs1': 'True'}
+                ]
+                log_cef("LoginSuccess", "Login Succeeded For %s" % user.email, items)  # noqa
                 if hasattr(user, 'is_desktop') and user.is_desktop:
                     """
                         Per bug #822396
@@ -49,10 +50,11 @@ def login_view(request):
                 else:
                     return HttpResponseRedirect(reverse('upload'))
             else:
-                items = []
-                items.append({'suser': username})
-                items.append({'cs1Label': 'LoginSuccess'})
-                items.append({'cs1': 'False'})
+                items = [
+                    {'suser': username},
+                    {'cs1Label': 'LoginSuccess'},
+                    {'cs1': 'False'}
+                ]
                 log_cef("LoginFail", "Login Failed For %s" % username, items)
                 error = 'Invalid Username/Password'
         else:

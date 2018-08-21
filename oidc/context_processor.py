@@ -2,8 +2,9 @@ from django.conf import settings
 
 
 def has_admin_claim_group(request):
-    r_context = {}
-    r_context['has_admin_claim_group'] = False
+    r_context = {
+        'has_admin_claim_group': False
+    }
     try:
         c_group = settings.OIDC_DESKTOP_CLAIM_GROUP
 

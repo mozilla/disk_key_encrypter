@@ -199,7 +199,7 @@ class DatabaseStorage(Storage):
         return result
 
     def size(self, name):
-        "Get the size of the given filename or raise ObjectDoesNotExist."
+        """Get the size of the given filename or raise ObjectDoesNotExist."""
         query = 'SELECT %(size_column)s FROM %(table)s ' + \
                 'WHERE %(name_column)s = %%s'
         query %= self.__dict__

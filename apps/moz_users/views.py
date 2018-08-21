@@ -6,16 +6,16 @@ from apps.site import forms
 from apps.site.cef import log_cef
 
 
-def remote_user_login_required(function):
+def remote_user_login_required(func):
     # https://www.adelton.com/django/external-authentication-for-django-projects#idm139850931541280
     # https://code.djangoproject.com/ticket/25164
     def wrap(request, *args, **kwargs):
         if hasattr(request, 'user') and request.user.is_authenticated():
-            return function(request, *args, **kwargs)
+            return func(request, *args, **kwargs)
         else:
             raise PermissionDenied
-    wrap.__doc__ = function.__doc__
-    wrap.__name__ = function.__name__
+    wrap.__doc__ = func.__doc__
+    wrap.__name__ = func.__name__
     return wrap
 
 
@@ -23,8 +23,7 @@ def remote_user_login_required(function):
 def upload(request):
     error = None
     success = request.GET.get('success', False)
-    items = []
-    items.append({'suser': request.user})
+    items = [{'suser': request.user}]
     log_cef("UserUpload", "User uploaded new key", items)
     if success:
         success = 'Successfully Uploaded'
@@ -36,15 +35,16 @@ def upload(request):
             f.email_address = request.user.username
             f.save()
             success = 1
-            items = []
-            items.append({'user': request.user})
-            items.append({'asset_tag': f.asset_tag})
+            items = [
+                {'user': request.user},
+                {'asset_tag': f.asset_tag}
+            ]
             log_cef("UserUpload", "User uploaded new key", items)
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
             error = 'Validation Failed'
         except Exception, e:
-            error = 'An unknown error has occured %s' % e
+            error = 'An unknown error has occurred %s' % e
     else:
         form = forms.UploadFormUser()
     return render(request, 'upload.html', {
