@@ -1,14 +1,14 @@
 # Overview
 
 This directory contains configuration files for deploying [OpenResty](https://openresty.org/)
-as well as intructions for deploying WDE in a dual instance model using Openresty
+as well as instructions for deploying WDE in a dual instance model using Openresty
 as an authenticating reverse proxy.
 
 One instance of WDE will be the non-public instance which will surface the administrative
 interface, will bind to port 443 and will be accessed exclusively via VPN on a
 private IP
 
-The other instnace of WDE will be the public instance which will not surface the
+The other instance of WDE will be the public instance which will not surface the
 administrative interface, will bind to port 81 and will be fronted by the Zeus
 load balancer which will take care of terminating TLS and forwarding traffic to
 port 81 on the server
@@ -108,7 +108,8 @@ Create the two secrets files for OpenResty. These files are called
 * `/usr/local/openresty/nginx/conf/conf.d/secrets-non-public.conf`
 * `/usr/local/openresty/nginx/conf/conf.d/secrets-public.conf`
 
-Base them off the `openresty/conf.d/secrets.conf-dist` file's contents
+Base them off the [`openresty/conf.d/secrets.conf-dist`](conf.d/secrets.conf-dist)
+file's contents
 
 ## Configure Django secrets
 
@@ -117,7 +118,8 @@ These files are called
 * `/data/desktop_disk_encrypter/settings_non_public.py`
 * `/data/desktop_disk_encrypter/settings_public.py`
 
-Base them off the `settings_public_or_non_public.py-dist` file's contents
+Base them off the [`settings_public_or_non_public.py-dist`](../settings_public_or_non_public.py-dist)
+file's contents
 
 ## Start OpenResty
 
@@ -127,7 +129,13 @@ You can start OpenResty manually by running
 /usr/bin/openresty -g 'daemon off;'
 ```
 
-Or you can create a systemd or init.d file to launch it.
+Or you can use the included `init.d` script by running
+
+```
+service openresty start
+```
+
+Or you can create a systemd file to launch it.
 
 `/usr/bin/openresty` is a symlink to `/usr/local/openresty/nginx/sbin/nginx`.
 
@@ -136,6 +144,41 @@ You can view OpenResty logs with
 ```
 tail -f /usr/local/openresty/nginx/logs/*.log
 ```
+
+# Access Control
+
+Access to WDE is governed differently for the two different instances of the
+Django app.
+
+## Public Site Access Control
+
+The public site (which is accessed via port 81 on OpenResty) requires that users
+log into Mozilla Single Sign On (SSO) with a valid user. Beyond logging in,
+there are no authorization requirements for users. This means that most any user
+can log in and submit a key that they'd like escrowed in WDE
+
+## Non-Public Site Access Control
+
+The non-public site (which is accessed via port 443 on OpenResty) requires that
+users log into Mozilla SSO with a valid user and that they be a member of the
+group configured in  `/usr/local/openresty/nginx/conf/conf.d/secrets-non-public.conf`
+and `/data/desktop_disk_encrypter/settings_non_public.py`. The list of groups
+that the user is a member of is conveyed to OpenResty via an OIDC claim. This
+in turn is passed to the Django app via HTTP headers.
+
+The group that users must be a member of is set in the setting `OIDC_DESKTOP_CLAIM_GROUP`
+in `/data/desktop_disk_encrypter/settings_non_public.py` and in the setting
+`$allowed_group` in `/usr/local/openresty/nginx/conf/conf.d/secrets-non-public.conf`
+
+Any user who logs in and is a member of the group set in those settings will be
+able to access the administration interface via the non-public site but any user
+that logs in and is not a member of that group will be redirected to an error
+page.
+
+The reason that the group must be configured no only in OpenResty (via `/usr/local/openresty/nginx/conf/conf.d/secrets-non-public.conf`)
+but also in Django (via `/data/desktop_disk_encrypter/settings_non_public.py`)
+is that both OpenResty and Django check the user's group membership. This is an
+added layer of redundancy if OpenResty was somehow circumvented.
 
 # Flows
 
