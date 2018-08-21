@@ -1,6 +1,7 @@
 from django import template
 register = template.Library()
 
+
 @register.simple_tag
 def active_page(request, pattern):
     import re

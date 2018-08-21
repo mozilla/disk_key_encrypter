@@ -1,11 +1,7 @@
-# top-level views for the project, which don't belong in any specific app
-
 from django.views.generic.base import TemplateView
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
-from django.template import RequestContext
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
-import models
 import forms
 from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.csrf import requires_csrf_token
@@ -14,6 +10,7 @@ from apps.site.cef import log_cef
 
 class HomePage(TemplateView):
     template_name = "index.html"
+
 
 @requires_csrf_token
 def login_view(request):
@@ -28,7 +25,10 @@ def login_view(request):
     if request.method == "POST":
         form = forms.LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(username = form.cleaned_data['username'], password=form.cleaned_data['password'])
+            user = authenticate(
+                    username=form.cleaned_data['username'],
+                    password=form.cleaned_data['password']
+                    )
             if user:
                 login(request, user)
             if user is not None:
@@ -36,7 +36,7 @@ def login_view(request):
                 items.append({'suser': username})
                 items.append({'cs1Label': 'LoginSuccess'})
                 items.append({'cs1': 'True'})
-                log_cef("LoginSuccess", "Login Succeeded For %s" % user.email, items)
+                log_cef("LoginSuccess", "Login Succeeded For %s" % user.email, items) # noqa
                 if hasattr(user, 'is_desktop') and user.is_desktop:
                     """
                         Per bug #822396
@@ -46,7 +46,6 @@ def login_view(request):
                         specific to an ldap bit for the user
                     """
                     return HttpResponseRedirect(reverse('upload'))
-                    #return HttpResponseRedirect(reverse('desktop_admin'))
                 else:
                     return HttpResponseRedirect(reverse('upload'))
             else:
@@ -66,4 +65,3 @@ def login_view(request):
         'form': form,
         'error': error,
         })
-

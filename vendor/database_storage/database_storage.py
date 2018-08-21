@@ -5,11 +5,12 @@
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.core.files.storage import Storage
 from django.core.files import File
-from django.db import connection, transaction
+from django.db import connection
 
 import base64
 import StringIO
 import urlparse
+
 
 class DatabaseStorage(Storage):
     """
@@ -139,7 +140,7 @@ class DatabaseStorage(Storage):
         data = row[0]
         missing_padding = len(data) % 4
         if missing_padding != 0:
-            data += b'='* (4 - missing_padding)
+            data += b'=' * (4 - missing_padding)
         inMemFile = StringIO.StringIO(base64.b64decode(data))
         inMemFile.name = name
         inMemFile.mode = mode
@@ -168,8 +169,8 @@ class DatabaseStorage(Storage):
                     '%(data_column)s, %(size_column)s) VALUES (%%s, %%s, %%s)'
             query %= self.__dict__
             cursor.execute(query, (name, encoded, size))
-        #transaction.commit_unless_managed(using='default')
-        #transaction.commit()
+        # transaction.commit_unless_managed(using='default')
+        # transaction.commit()
         return name
 
     def exists(self, name):
@@ -185,8 +186,8 @@ class DatabaseStorage(Storage):
             query = 'DELETE FROM %(table)s WHERE %(name_column)s = %%s'
             query %= self.__dict__
             connection.cursor().execute(query, [name])
-            #transaction.commit_unless_managed(using='default')
-            #transaction.commit()
+            # transaction.commit_unless_managed(using='default')
+            # transaction.commit()
 
     def path(self, name):
         raise NotImplementedError('DatabaseStorage does not support path().')
