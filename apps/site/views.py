@@ -17,8 +17,6 @@ def login_view(request):
     logout(request)
     username = ""
     password = ""
-    list = ()
-    print list
     error = None
     initial = {
             'username': username,
