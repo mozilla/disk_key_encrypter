@@ -19,7 +19,8 @@ def user_has_claim(func):
     def wrap(request, *args, **kwargs):
         # This check is in addition to the check done by OpenResty and acts as
         # a redundant check for added security
-        groups = request.META.get(settings.GROUPS_META_VAR, '').split('|')
+        groups_header = request.META.get(settings.GROUPS_META_VAR, '')
+        groups = groups_header.split('|') if groups_header else []
         if (hasattr(request, 'user') and request.user.is_authenticated()
                 and settings.OIDC_DESKTOP_CLAIM_GROUP in groups):
             return func(request, *args, **kwargs)
