@@ -10,7 +10,8 @@ def has_admin_claim_group(request):
 
         # This check is in addition to the check done by openresty and acts as
         # a redundant check for added security
-        groups = request.META.get(settings.GROUPS_META_VAR, '').split('|')
+        groups_header = request.META.get(settings.GROUPS_META_VAR, '')
+        groups = groups_header.split('|') if groups_header else []
         if c_group in groups:
             r_context['has_admin_claim_group'] = True
     except:
