@@ -1,5 +1,5 @@
 from django import forms
-import models
+from . import models
 from apps.site.gpg import encrypt
 from settings import GPG_KEY_IDS, HOMEDIR
 
@@ -20,6 +20,7 @@ class UploadFormUser(forms.ModelForm):
             that gets us
         """
 
+        data = bytes(data, 'utf8')
         if len(data) > 0:
             data = encrypt(data, GPG_KEY_IDS, HOMEDIR)
         return data
@@ -39,8 +40,8 @@ class UploadFormUser(forms.ModelForm):
             data.file.write(encrypted)
             data.file.seek(0)
             return data
-        except Exception, e:
-            print e
+        except Exception as e:
+            print(e)
             pass
 
     class Meta:
@@ -56,12 +57,17 @@ class UploadFormUser(forms.ModelForm):
 class UploadFormDesktop(UploadFormUser):
 
     def get_binary_blob(self):
-        print 'called'
+        print('called')
         return 'asdf'
 
     class Meta:
         model = models.EncryptedDisk
-        exclude = ()
+        exclude = [
+            'legacy_binary_blob_data',
+            'legacy_binary_blob',
+            'legacy_file_size',
+
+        ]
 
 
 class UploadFormDesktopUpload(UploadFormUser):

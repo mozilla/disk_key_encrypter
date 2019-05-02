@@ -60,5 +60,5 @@ to GPG as UTF-8 data.
         if gpg.returncode != 0:
             raise EncryptionError("%d: %s" % (gpg.returncode, output[1]))
         return output[0]
-    except OSError, e:
+    except OSError as e:
         raise EncryptionError(e)

@@ -5,14 +5,23 @@ from django.shortcuts import render, get_object_or_404
 import apps.site.models as site_models
 import apps.site.forms as forms
 from django.db.models import Q
-from vendor.database_storage import DatabaseStorage
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files import File
+from django.db import connection
 from settings import DBS_OPTIONS, PAGINATION_LENGTH
 import mimetypes
 import operator
+import base64
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.urlresolvers import reverse
 from apps.site.cef import log_cef
 from django.conf import settings
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+from functools import reduce
 
 
 def user_has_claim(func):
@@ -21,8 +30,10 @@ def user_has_claim(func):
         # a redundant check for added security
         groups_header = request.META.get(settings.GROUPS_META_VAR, '')
         groups = groups_header.split('|') if groups_header else []
+        if (hasattr(request, 'user') and request.user.is_authenticated() and settings.OIDC_DESKTOP_CLAIM_GROUP is None):
+            return func(request, *args, **kwargs)
         if (hasattr(request, 'user') and request.user.is_authenticated()
-                and settings.OIDC_DESKTOP_CLAIM_GROUP in groups):
+                and settings.OIDC_DESKTOP_CLAIM_GROUP in groups ):
             return func(request, *args, **kwargs)
         else:
             raise PermissionDenied
@@ -47,6 +58,12 @@ def detail(request, id_value):
                 f = form.save(commit=False)
                 if request.POST.get('binary_blob-clear'):
                     f.binary_blob.delete()
+                import pdb; pdb.set_trace()
+                if form.cleaned_data['binary_blob']:
+                    if isinstance(form.cleaned_data['binary_blob'], InMemoryUploadedFile):
+                        t_file = form.cleaned_data['binary_blob']
+                        t_file.seek(0)
+                        f.file_data = t_file.read()
                 if f.user:
                     f.email_address = f.user.username
                 f.save()
@@ -63,7 +80,7 @@ def detail(request, id_value):
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
             error = 'Validation Failed'
-        except Exception, e:
+        except Exception as e:
             error = 'An unknown error has occurred %s' % e
     else:
         form = forms.UploadFormDesktop(instance=disk)
@@ -79,6 +96,7 @@ def detail(request, id_value):
     return render(request, 'detail.html', {
         'form': form,
         'id': id_value,
+        'disk': disk,
         'success': success,
         'error': error,
         })
@@ -95,6 +113,7 @@ def upload(request):
         try:
             if form.is_valid():
                 f = form.save(commit=False)
+                import pdb; pdb.set_trace()
                 if request.POST.get('binary_blob-clear'):
                     f.binary_blob.delete()
                 if f.user:
@@ -109,7 +128,7 @@ def upload(request):
                 return HttpResponseRedirect(reverse('desktop_admin'))
         except ValueError:
             error = 'Validation Failed'
-        except Exception, e:
+        except Exception as e:
             error = 'An unknown error has occurred %s' % e
     else:
         form = forms.UploadFormDesktopUpload()
@@ -157,6 +176,36 @@ def desktop_admin(request):
 @user_has_claim
 def download_attach(request, filename):
         # Read file from database
+        query = 'SELECT legacy_binary_blob_data FROM site_encrypteddisk WHERE legacy_binary_blob = %s'
+        print(query)
+        cursor = connection.cursor()
+        cursor.execute(query, [filename])
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        data = row[0]
+        print(data)
+        missing_padding = len(data) % 4
+        if missing_padding != 0:
+            data += b'=' * (4 - missing_padding)
+        decoded_data = str(base64.b64decode(data).decode("utf8"))
+        inMemFile = StringIO(decoded_data)
+        inMemFile.name = filename
+        inMemFile.mode = 'rb'
+
+        file_content = File(inMemFile)
+        content_type, content_encoding = mimetypes.guess_type(filename)
+        content_type = 'application/force-download'
+        print(content_type)
+        response = HttpResponse(
+                content=file_content,
+                content_type=content_type
+                )
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        if content_encoding:
+            response['Content-Encoding'] = content_encoding
+        return response
+        """
         storage = DatabaseStorage(DBS_OPTIONS)
         gpg_file = storage.open(filename, 'rb')
         if not gpg_file:
@@ -164,13 +213,6 @@ def download_attach(request, filename):
         file_content = gpg_file.read()
 
         # Prepare response
-        content_type, content_encoding = mimetypes.guess_type(filename)
-        response = HttpResponse(
-                content=file_content,
-                content_type=content_type
-                )
-        response['Content-Disposition'] = 'inline; filename=%s' % filename
-        if content_encoding:
-            response['Content-Encoding'] = content_encoding
         log_cef("AdminDownload", "Desktop Admin downloaded file %s" % filename)
-        return response
+        response = "fixme"
+        """

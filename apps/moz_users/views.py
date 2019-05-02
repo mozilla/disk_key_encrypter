@@ -43,7 +43,7 @@ def upload(request):
             return HttpResponseRedirect('?success=%s' % success)
         except ValueError:
             error = 'Validation Failed'
-        except Exception, e:
+        except Exception as e:
             error = 'An unknown error has occurred %s' % e
     else:
         form = forms.UploadFormUser()
