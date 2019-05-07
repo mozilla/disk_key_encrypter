@@ -12,9 +12,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+#        migrations.AddField(
+#            model_name='encrypteddisk',
+#            name='binary_blob_data',
+#            field=models.TextField(blank=True, null=True),
+#        ),
         migrations.AddField(
             model_name='encrypteddisk',
             name='file_data',
-            field=models.BinaryField(null=True),
+            field=models.TextField(null=True),
         ),
     ]

@@ -26,23 +26,26 @@ class UploadFormUser(forms.ModelForm):
         return data
 
     def clean_binary_blob(self):
-        data = self.cleaned_data['binary_blob']
         try:
-            if data.file._size > 10*1024*1024:
+            data = self.files['binary_blob'].file
+        except KeyError:
+            return
+        try:
+            if len(data.read()) > 10*1024*1024:
                 raise forms.ValidationError("Image file too large ( > 10mb )")
-        except:
-            pass
+            data.seek(0)
+        except AttributeError:
+            return
         try:
-            tmp = data.file.read()
+            data.seek(0)
+            data.truncate(0)
+            tmp = data.read()
             encrypted = encrypt(tmp, GPG_KEY_IDS, HOMEDIR)
-            data.file.truncate(0)
-            data.file.seek(0)
-            data.file.write(encrypted)
-            data.file.seek(0)
-            return data
+            return encrypted
         except Exception as e:
             print(e)
             pass
+        return 
 
     class Meta:
         model = models.EncryptedDisk
@@ -51,6 +54,12 @@ class UploadFormUser(forms.ModelForm):
                 'email_address',
                 'created_on',
                 'updated_on',
+                'legacy_binary_blob',
+                'legacy_file_size',
+                'file_size',
+                'file_data',
+                'legacy_binary_blob_data',
+                'file_name',
                 )
 
 

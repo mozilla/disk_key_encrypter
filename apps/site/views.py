@@ -1,7 +1,7 @@
 from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from .forms import LoginForm
 from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.csrf import requires_csrf_token

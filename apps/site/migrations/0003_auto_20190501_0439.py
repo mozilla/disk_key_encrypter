@@ -12,14 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='encrypteddisk',
-            old_name='binary_blob',
-            new_name='legacy_binary_blob',
-        ),
-        migrations.RenameField(
-            model_name='encrypteddisk',
-            old_name='binary_blob_data',
-            new_name='legacy_binary_blob_data',
-        ),
     ]

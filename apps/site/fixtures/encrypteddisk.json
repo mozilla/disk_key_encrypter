@@ -1,0 +1,48 @@
+[
+    {
+        "model": "site.encryptiontype",
+        "pk": 1,
+        "fields": {
+            "encryption_type": "Apple OS X - FileVault"
+        }
+    },
+    {
+        "model": "site.encryptiontype",
+        "pk": 2,
+        "fields": {
+            "encryption_type": "Linux - LUKS"
+        }
+    },
+    {
+        "model": "site.encryptiontype",
+        "pk": 3,
+        "fields": {
+            "encryption_type": "Windows - Bitlocker"
+        }
+    },
+    {
+        "model": "site.encryptiontype",
+        "pk": 4,
+        "fields": {
+            "encryption_type": "CrashPlan"
+        }
+    },
+    {
+        "model": "site.encrypteddisk",
+        "pk": 1,
+        "fields": {
+            "email_address": "user@domain.com",
+            "user": 2,
+            "asset_tag": "123456",
+            "encryption_type": 1,
+            "created_on": "2012-10-11T23:35:23Z",
+            "updated_on": "2019-05-02T17:40:05Z",
+            "recovery_key": "-----BEGIN PGP MESSAGE-----Version: GnuPG v2.0.14 (GNU/Linux)File Data Here-----END PGP MESSAGE-----",
+            "file_data": "-----BEGIN PGP MESSAGE-----Version: GnuPG v2.0.14 (GNU/Linux)File Data Here-----END PGP MESSAGE-----",
+            "file_name": "gpg/Screen_Shot_2012-08-23_at_8.17.54_AM.png",
+            "legacy_binary_blob": "b'-----BEGIN PGP MESSAGE-----\\nVersion: GnuPG v2.0.14 (GNU/Linux)\\n\\nhQEMA'",
+            "legacy_binary_blob_data": "",
+            "legacy_file_size": 156031
+        }
+    }
+]
