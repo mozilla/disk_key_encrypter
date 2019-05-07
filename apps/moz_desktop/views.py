@@ -31,7 +31,11 @@ def user_has_claim(func):
         # a redundant check for added security
         groups_header = request.META.get(settings.GROUPS_META_VAR, '')
         groups = groups_header.split('|') if groups_header else []
-        if not os.environ['ALLOW_ADMIN'] == 'True':
+        try:
+            allow_admin = os.environ["ALLOW_ADMIN"]
+        except KeyError:
+            allow_admin = False
+        if not allow_admin:
             raise PermissionDenied
         if (hasattr(request, 'user') and request.user.is_authenticated and settings.OIDC_DESKTOP_CLAIM_GROUP is None):
             return func(request, *args, **kwargs)
