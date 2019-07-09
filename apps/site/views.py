@@ -1,8 +1,8 @@
 from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
-import forms
+from django.urls import reverse
+from .forms import LoginForm
 from django.contrib.auth import login, logout, authenticate
 from django.views.decorators.csrf import requires_csrf_token
 from apps.site.cef import log_cef
@@ -23,7 +23,7 @@ def login_view(request):
             'password': password
             }
     if request.method == "POST":
-        form = forms.LoginForm(request.POST)
+        form = LoginForm(request.POST)
         if form.is_valid():
             user = authenticate(
                     username=form.cleaned_data['username'],
@@ -60,7 +60,7 @@ def login_view(request):
         else:
             error = 'Please supply both a username and password'
     else:
-        form = forms.LoginForm(initial=initial)
+        form = LoginForm(initial=initial)
     return render(request, 'login.html', {
         'username': username,
         'password': password,

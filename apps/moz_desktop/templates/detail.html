@@ -20,5 +20,10 @@
     </p>
     {% csrf_token %}
     </form>
+    {% if disk.legacy_binary_blob %}
+        <a href="{% url "attach" disk.legacy_binary_blob %}" target="_blank">Download Binary Attachment {{ legacy_binary_blob }}</a>
+
+
+    {% endif %}
 </div>
 {% endblock %}
