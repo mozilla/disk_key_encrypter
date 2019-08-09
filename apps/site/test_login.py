@@ -98,7 +98,10 @@ class URLsTestALLOW_ADMIN_TRUE(TestCase):
 
 class URLsTestALLOW_ADMIN_FALSE(TestCase):
 
-    fixtures = ['users']
+    fixtures = [
+        'users',
+        'encrypteddisk',
+    ]
 
     def setUp(self):
         self.client = Client()
@@ -109,3 +112,11 @@ class URLsTestALLOW_ADMIN_FALSE(TestCase):
         for key,value in namespaces_to_test.items():
             response = self.client.get(reverse(key, kwargs=value))
             self.assertEqual(response.status_code, 403)
+
+    @mock.patch.dict(os.environ, {'ALLOW_ADMIN': 'False'})
+    def test2_cannot_see_protected_urls_with_settings_override(self):
+        with self.settings(ALLOW_ADMIN=True):
+            self.client.login(username='test_normal_user', password='password')
+            for key,value in namespaces_to_test.items():
+                response = self.client.get(reverse(key, kwargs=value))
+                self.assertEqual(response.status_code, 403)
