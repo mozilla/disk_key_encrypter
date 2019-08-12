@@ -23,6 +23,10 @@ class UploadFormUser(forms.ModelForm):
         data = bytes(data, 'utf8')
         if len(data) > 0:
             data = encrypt(data, GPG_KEY_IDS, HOMEDIR)
+        try:
+            data = data.decode()
+        except AttributeError:
+            pass
         return data
 
     def clean_binary_blob(self):
@@ -80,6 +84,14 @@ class UploadFormDesktop(UploadFormUser):
 
 
 class UploadFormDesktopUpload(UploadFormUser):
+
+    def clean_recovery_key(self):
+        recovery_key = super(UploadFormDesktopUpload, self).clean_recovery_key()
+        try:
+            recovery_key = recovery_key.decode()
+        except AttributeError:
+            pass
+        return recovery_key
 
     class Meta:
         model = models.EncryptedDisk

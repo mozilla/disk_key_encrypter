@@ -13,6 +13,7 @@ import mimetypes
 import operator
 import base64
 import os
+import re
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 from apps.site.cef import log_cef
@@ -97,6 +98,8 @@ def detail(request, id_value):
         except Exception as e:
             error = 'An unknown error has occurred %s' % e
     else:
+        disk.recovery_key = re.sub("^b'","", disk.recovery_key)
+        disk.recovery_key = re.sub("'$","", disk.recovery_key)
         form = forms.UploadFormDesktop(instance=disk)
         items = [
             {'suser': request.user},
@@ -196,7 +199,12 @@ def download_attach(request, id):
         data += b'=' * (4 - missing_padding)
     decoded_data = str(base64.b64decode(data).decode("utf8"))
     """
-    inMemFile = StringIO(disk.file_data)
+    try:
+        file_data = disk.file_data.decode()
+    except AttributeError:
+        file_data = disk.file_data
+
+    inMemFile = StringIO(file_data)
     inMemFile.name = disk.file_name
     inMemFile.mode = 'rb'
 
