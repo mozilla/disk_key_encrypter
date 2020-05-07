@@ -27,3 +27,15 @@
     {% endif %}
 </div>
 {% endblock %}
+{% block js %}
+<script type="text/javascript">
+$( document ).ready(function() {
+    $("#the_form").submit(function(){
+        var current_text = $("#id_recovery_key").val();
+        $("#id_recovery_key").val(current_text.replace(/\u0000/g,''));
+    });
+
+
+});
+</script>
+{% endblock %}
