@@ -14,6 +14,8 @@ class HomePage(TemplateView):
 
 @requires_csrf_token
 def login_view(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect(reverse('home'))
     logout(request)
     username = ""
     password = ""
