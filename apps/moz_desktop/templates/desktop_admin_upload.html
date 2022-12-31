@@ -12,7 +12,7 @@
             {{ success }}
         </div>
     {% endif %}
-    <form method="post" enctype="multipart/form-data" class="" action=".">
+    <form id="the_form" method="post" enctype="multipart/form-data" class="" action=".">
     {{ form.as_table }}
     <p>
         <button onclick='self.location = "{% url "desktop_admin" %}";' type="button" name="btn_cancel" id="btn_cancel" class="btn btn-cancel">Cancel</button>
@@ -21,4 +21,18 @@
     {% csrf_token %}
     </form>
 </div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+$( document ).ready(function() {
+    $("#the_form").submit(function(){
+        var current_text = $("#id_recovery_key").val();
+        $("#id_recovery_key").val(current_text.replace(/\u0000/g,''));
+    });
+
+
+});
+</script>
+
 {% endblock %}
